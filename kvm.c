@@ -573,6 +573,9 @@ void kvm__reboot(struct kvm *kvm)
 
 void kvm__continue(struct kvm *kvm)
 {
+	if (!kvm->cpus[0]->is_running)
+		kvm_arm_get_virtual_time(kvm->cpus[0]);
+
 	mutex_unlock(&pause_lock);
 }
 
@@ -585,6 +588,8 @@ void kvm__pause(struct kvm *kvm)
 	/* Check if the guest is running */
 	if (!kvm->cpus || !kvm->cpus[0] || kvm->cpus[0]->thread == 0)
 		return;
+
+	kvm_arm_put_virtual_time(kvm->cpus[0]);
 
 	pause_event = eventfd(0, 0);
 	if (pause_event < 0)

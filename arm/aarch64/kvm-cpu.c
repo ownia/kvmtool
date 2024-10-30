@@ -328,3 +328,25 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
 		die("KVM_GET_ONE_REG failed (lr)");
 	dprintf(debug_fd, " LR:    0x%lx\n", data);
 }
+
+void kvm_arm_get_virtual_time(struct kvm_cpu *vcpu)
+{
+	struct kvm_one_reg reg;
+	unsigned long data;
+
+	reg.addr = (u64)&data;
+	reg.id = KVM_REG_ARM_TIMER_CNT;
+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+		die("KVM_GET_ONE_REG failed (show_code @ PC)");
+}
+
+void kvm_arm_put_virtual_time(struct kvm_cpu *vcpu)
+{
+	struct kvm_one_reg reg;
+	unsigned long data;
+
+	reg.addr = (u64)&data;
+	reg.id = KVM_REG_ARM_TIMER_CNT;
+	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
+		die("KVM_GET_ONE_REG failed (show_code @ PC)");
+}
